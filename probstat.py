@@ -10,7 +10,7 @@ cachedStopWords = stopwords.words("english")
 nltk.download("reuters")
 import os
 import sys
-import numpy
+#import numpy
 from sklearn.svm import LinearSVC
 from sklearn.metrics import confusion_matrix
 import numpy as np
@@ -53,7 +53,7 @@ def collection_stats():
 
 def tokenize(text):
     min_length = 3
-    words = map(lambda word: word.lower(), word_tokenize(text));
+    words = map(lambda word: word.lower(), word_tokenize(text))
     words = [word for word in words
                   if word not in cachedStopWords]
     tokens =(list(map(lambda token: PorterStemmer().stem(token),
@@ -140,5 +140,27 @@ for doc in doclist:
 f = open("project.txt",'w')
 I = docnames
 C = allwords
-matrix = DataFrame(matrix,index = I, columns = C)
-print(matrix, file = f)
+printable_matrix = DataFrame(matrix,index = I, columns = C)
+#print(printable_matrix, file = f)
+row0 = matrix[0]
+row1 = matrix[1]
+x = [row0,row1]
+y = np.cov(x)[1][0]
+print(y)
+
+covariance_matrix = []
+cov_row = []
+for a in range(0,len(doclist) -2300) :
+    for b in range(0, len(doclist) - 2300) :
+        if a == b:
+            cov_row.append(1)
+        else:
+            x = [matrix[a], matrix[b]]
+            y = np.cov(x)[1][0]
+            cov_row.append(y)
+    covariance_matrix.append(cov_row)
+    cov_row = []
+test = I[: (len(I) - 2300)]
+printable_cov_matrix = DataFrame(covariance_matrix,index = test, columns = test)
+f2 = open("covariance_matrix.txt", 'w')
+print(printable_cov_matrix, file = f2)
